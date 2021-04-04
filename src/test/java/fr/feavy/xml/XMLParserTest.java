@@ -2,11 +2,27 @@ package fr.feavy.xml;
 
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 public class XMLParserTest {
+
+    @Test
+    public void fileParsingIsCorrect() {
+        File file = new File(getClass().getResource("/fileParsingIsCorrect.xml").getFile());
+        try (FileInputStream fis = new FileInputStream(file)) {
+            XMLElement root = XMLParser.parse(fis);
+            assertEquals("div", root.getTagName());
+            assertEquals(1, root.getChilds().size());
+            assertEquals("Hello !", root.getChild(0).getContent());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void simpleParsingIsCorrect() {
