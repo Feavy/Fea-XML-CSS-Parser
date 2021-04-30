@@ -37,7 +37,7 @@ public class XMLParser {
         String line;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             while ((line = reader.readLine()) != null) {
-                strBuilder.append(line.trim()).append("\n");
+                strBuilder.append(line).append("\n");
             }
         } catch (IOException e) {
         }
@@ -52,7 +52,11 @@ public class XMLParser {
         fileContent = fileContent.replaceAll(">(.*)<", ">\n$1\n<")
                 .replaceAll(">(.)", ">\n$1")
                 .replaceAll("(.)<", "$1\n<");
-        iterator = Arrays.asList(fileContent.split("\n")).listIterator();
+        String[] lines = fileContent.split("\n");
+        for(int i = 0; i < lines.length; i++) {
+            lines[i] = lines[i].trim();
+        }
+        iterator = Arrays.asList(lines).listIterator();
         return parseElement();
     }
 
