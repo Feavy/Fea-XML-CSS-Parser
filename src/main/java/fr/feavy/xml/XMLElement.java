@@ -144,7 +144,7 @@ public class XMLElement {
             return builder.append(spaces(indent)).append("<").append(tagName).append(getAttributesAsString()).append(" />\n").toString();
         }
         builder.append(spaces(indent)).append("<").append(tagName).append(getAttributesAsString()).append(">");
-        if (content != null) {
+        if (content != null && content.trim().length() > 0) {
             builder.append("\n").append(content);
         } else {
             builder.append("\n");
