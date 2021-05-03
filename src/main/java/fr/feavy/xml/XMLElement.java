@@ -219,6 +219,7 @@ public class XMLElement {
     }
 
     public void visitDeep(Consumer<XMLElement> consumer) {
+        consumer.accept(this);
         for (XMLElement child : childs) {
             consumer.accept(child);
             child.visitDeep(consumer);
