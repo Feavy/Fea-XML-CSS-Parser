@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class XMLParser {
-    private static final Pattern ATTRIBUTE_PATTERN = Pattern.compile("(?<key>[a-zA-Z0-9_-]+)=\"(?<value>[^\"]*)\"");
+    private static final Pattern ATTRIBUTE_PATTERN = Pattern.compile("(?<key>[:a-zA-Z0-9_-]+)=\"(?<value>[^\"]*)\"");
     private ListIterator<String> iterator;
     private String tag = null;
     private Map<String, String> properties = new HashMap<>();
