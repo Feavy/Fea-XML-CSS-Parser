@@ -31,6 +31,10 @@ public class CSSRule {
             CSSRule current = new CSSRule(selectors, properties);
 
             String[] strings = declaration.split("\\{");
+            
+            if(strings.length < 2) {
+                continue;
+            }
 
             String[] selectorsStr = strings[0].split(",");
             String[] propertiesStr = strings[1].split(";");
