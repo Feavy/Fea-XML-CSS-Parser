@@ -1,13 +1,13 @@
 package fr.feavy.xml;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class XMLParserTest {
 
@@ -17,7 +17,7 @@ public class XMLParserTest {
         try (FileInputStream fis = new FileInputStream(file)) {
             XMLElement root = XMLParser.parse(fis);
             assertEquals("div", root.getTagName());
-            assertEquals(1, root.getChilds().size());
+            assertEquals(1, root.getChildren().size());
             assertEquals("Hello !", root.getChild(0).getContent());
         } catch (IOException e) {
             e.printStackTrace();
@@ -29,7 +29,7 @@ public class XMLParserTest {
         String input = "<div><text>Hello !</text></div>";
         XMLElement root = XMLParser.parse(input);
         assertEquals("div", root.getTagName());
-        assertEquals(1, root.getChilds().size());
+        assertEquals(1, root.getChildren().size());
         assertEquals("Hello !", root.getChild(0).getContent());
     }
 
@@ -47,7 +47,7 @@ public class XMLParserTest {
 
         // When
         XMLElement root = XMLParser.parse(input);
-        List<XMLElement> childs = root.getChilds();
+        List<XMLElement> childs = root.getChildren();
 
         List<XMLElement> test2Childs = root.getElementsByClassName("test2");
         List<XMLElement> testChilds = root.getElementsByClassName("test");

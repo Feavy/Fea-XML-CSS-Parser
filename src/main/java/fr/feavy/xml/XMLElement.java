@@ -3,16 +3,20 @@ package fr.feavy.xml;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class XMLElement {
+public class XMLElement implements Cloneable {
     protected final Map<String, String> attributes;
     private final String tagName;
-    private List<XMLElement> childs = new ArrayList<>();
+    private final List<XMLElement> children = new ArrayList<>();
     private XMLElement parent;
     private String content = null;
 
-    XMLElement(String tagName, Map<String, String> attributes) {
+    public XMLElement(String tagName, Map<String, String> attributes) {
         this.tagName = tagName;
         this.attributes = attributes;
+    }
+
+    public XMLElement(String tagName) {
+        this(tagName, new HashMap<>());
     }
 
     static String spaces(int amount) {
@@ -23,8 +27,20 @@ public class XMLElement {
         return builder.toString();
     }
 
+    public boolean hasAttribute(String name) {
+        return getAttribute(name) != null;
+    }
+
+    public boolean hasAttributes() {
+        return !attributes.isEmpty();
+    }
+
     public void setAttribute(String key, String value) {
         attributes.put(key, value);
+    }
+
+    public void removeAttribute(String key) {
+        attributes.remove(key);
     }
 
     public String getAttribute(String key) {
@@ -90,47 +106,43 @@ public class XMLElement {
         setAttribute("class", String.join(" ", classList));
     }
 
-    public boolean hasAttributes() {
-        return !attributes.isEmpty();
-    }
-
     public String getTagName() {
         return this.tagName;
     }
 
-    public List<XMLElement> getChilds() {
-        return this.childs;
+    public List<XMLElement> getChildren() {
+        return this.children;
     }
 
     public XMLElement getChild(int index) {
-        return this.childs.get(index);
+        return this.children.get(index);
     }
 
-    public void removeChilds() {
-        this.childs.clear();
+    public void removeChildren() {
+        this.children.clear();
     }
 
     public void removeChild(int index) {
-        this.childs.remove(index);
+        this.children.remove(index);
     }
 
     public void removeChild(XMLElement child) {
-        this.childs.remove(child);
+        this.children.remove(child);
     }
 
     public void addChild(XMLElement child) {
-        this.childs.add(child);
+        this.children.add(child);
         child.parent = this;
     }
 
-    public void addChilds(Collection<XMLElement> childs) {
+    public void addChildren(Collection<XMLElement> childs) {
         for (XMLElement child : childs) {
             addChild(child);
         }
     }
 
-    public boolean hasChilds() {
-        return !childs.isEmpty();
+    public boolean hasChildren() {
+        return !children.isEmpty();
     }
 
     @Override
@@ -140,7 +152,7 @@ public class XMLElement {
 
     public String toString(int indent) {
         StringBuilder builder = new StringBuilder();
-        if (content == null && childs.size() == 0) {
+        if (content == null && children.size() == 0) {
             return builder.append(spaces(indent)).append("<").append(tagName).append(getAttributesAsString()).append(" />\n").toString();
         }
         builder.append(spaces(indent)).append("<").append(tagName).append(getAttributesAsString()).append(">");
@@ -148,7 +160,7 @@ public class XMLElement {
             builder.append("\n").append(content);
         } else {
             builder.append("\n");
-            for (XMLElement element : childs) {
+            for (XMLElement element : children) {
                 builder.append(element.toString(indent + 2));
             }
             builder.append(spaces(indent));
@@ -162,7 +174,7 @@ public class XMLElement {
             return this;
         }
         XMLElement element;
-        for (XMLElement child : childs) {
+        for (XMLElement child : children) {
             if ((element = child.getElementById(id)) != null) {
                 return element;
             }
@@ -172,7 +184,7 @@ public class XMLElement {
 
     public List<XMLElement> getElementsByTagName(String tagName) {
         List<XMLElement> rep = new ArrayList<>();
-        for (XMLElement child : childs) {
+        for (XMLElement child : children) {
             if (child.tagName.equals(tagName)) {
                 rep.add(child);
             }
@@ -183,7 +195,7 @@ public class XMLElement {
 
     public List<XMLElement> getElementsByClassName(String clazz) {
         List<XMLElement> rep = new ArrayList<>();
-        for (XMLElement child : childs) {
+        for (XMLElement child : children) {
             if (child.getClasses().contains(clazz)) {
                 rep.add(child);
             }
@@ -212,7 +224,7 @@ public class XMLElement {
     public XMLElement clone() {
         XMLElement rep = new XMLElement(this.tagName, new HashMap<>(this.attributes));
         rep.setContent(this.getContent());
-        for (XMLElement child : childs) {
+        for (XMLElement child : children) {
             rep.addChild(child.clone());
         }
         return rep;
@@ -220,9 +232,10 @@ public class XMLElement {
 
     public void visitDeep(Consumer<XMLElement> consumer) {
         consumer.accept(this);
-        for (XMLElement child : childs) {
+        for (XMLElement child : children) {
             consumer.accept(child);
             child.visitDeep(consumer);
         }
     }
+
 }

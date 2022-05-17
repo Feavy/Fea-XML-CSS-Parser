@@ -13,6 +13,10 @@ public class StyleElement extends XMLElement {
         super("style", attributes);
     }
 
+    public StyleElement() {
+        super("style");
+    }
+
     public List<CSSRule> getRules() {
         return rules;
     }

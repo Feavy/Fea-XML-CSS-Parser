@@ -5,8 +5,8 @@ import java.util.*;
 import static fr.feavy.xml.XMLElement.spaces;
 
 public class CSSRule {
-    private Set<String> selectors;
-    private Map<String, String> properties;
+    private final Set<String> selectors;
+    private final Map<String, String> properties;
 
     public CSSRule() {
         this.selectors = new HashSet<>();
@@ -69,6 +69,10 @@ public class CSSRule {
 
     public void setProperty(String name, String value) {
         properties.put(name, value);
+    }
+
+    public void removeProperty(String property) {
+        properties.remove(property);
     }
 
     public Set<String> getSelectors() {
