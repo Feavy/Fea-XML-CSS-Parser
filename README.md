@@ -1,4 +1,6 @@
 # Fea-XML-Parser
+[![](https://jitpack.io/v/Feavy/Fea-XML-Parser.svg)](https://jitpack.io/#Feavy/Fea-XML-Parser)
+
 Simple Java XML Parser with CSS support
 
 ## Examples
