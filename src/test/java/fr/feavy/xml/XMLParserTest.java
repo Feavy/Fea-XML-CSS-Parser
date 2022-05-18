@@ -15,7 +15,7 @@ public class XMLParserTest {
     public void fileParsingIsCorrect() {
         File file = new File(getClass().getResource("/fileParsingIsCorrect.xml").getFile());
         try (FileInputStream fis = new FileInputStream(file)) {
-            XMLElement root = XMLParser.parse(fis);
+            XMLElement root = new XMLParser().parse(fis);
             assertEquals("div", root.getTagName());
             assertEquals(1, root.getChildren().size());
             assertEquals("Hello !", root.getChild(0).getContent());
@@ -27,7 +27,7 @@ public class XMLParserTest {
     @Test
     public void simpleParsingIsCorrect() {
         String input = "<div><text>Hello !</text></div>";
-        XMLElement root = XMLParser.parse(input);
+        XMLElement root = new XMLParser().parse(input);
         assertEquals("div", root.getTagName());
         assertEquals(1, root.getChildren().size());
         assertEquals("Hello !", root.getChild(0).getContent());
@@ -46,24 +46,62 @@ public class XMLParserTest {
                       "</div>";
 
         // When
-        XMLElement root = XMLParser.parse(input);
-        List<XMLElement> childs = root.getChildren();
+        XMLElement root = new XMLParser().parse(input);
+        List<XMLElement> children = root.getChildren();
 
-        List<XMLElement> test2Childs = root.getElementsByClassName("test2");
-        List<XMLElement> testChilds = root.getElementsByClassName("test");
+        List<XMLElement> test2Children = root.getElementsByClassName("test2");
+        List<XMLElement> testChildren = root.getElementsByClassName("test");
 
         // Then
-        assertEquals(6, childs.size());
+        assertEquals(6, children.size());
 
-        assertEquals(4, test2Childs.size());
-        assertEquals("test2", test2Childs.get(0).getContent());
-        assertEquals("test test2 test3", test2Childs.get(1).getContent());
-        assertEquals("test test2", test2Childs.get(2).getContent());
-        assertEquals("test2!!", test2Childs.get(3).getContent());
+        assertEquals(4, test2Children.size());
+        assertEquals("test2", test2Children.get(0).getContent());
+        assertEquals("test test2 test3", test2Children.get(1).getContent());
+        assertEquals("test test2", test2Children.get(2).getContent());
+        assertEquals("test2!!", test2Children.get(3).getContent());
 
-        assertEquals(3, testChilds.size());
-        assertEquals("test test2 test3", testChilds.get(0).getContent());
-        assertEquals("test test2", testChilds.get(1).getContent());
-        assertEquals("test", testChilds.get(2).getContent());
+        assertEquals(3, testChildren.size());
+        assertEquals("test test2 test3", testChildren.get(0).getContent());
+        assertEquals("test test2", testChildren.get(1).getContent());
+        assertEquals("test", testChildren.get(2).getContent());
+    }
+
+    @Test
+    public void styleIsHandled() {
+        // Given
+        String input = "<html>\n" +
+                "<style id=\"st\">\n" +
+                ".red {\n" +
+                "color: red;" +
+                "}" +
+                "</style>\n" +
+                "</html>";
+
+        // When
+        XMLElement root = new XMLParser().parse(input);
+
+        // Then
+        assertEquals(StyleElement.class, root.getElementById("st").getClass());
+        StyleElement style = (StyleElement) root.getElementById("st");
+        assertEquals(1, style.getRules().size());
+        CSSRule rule = style.getRule(0);
+        assertEquals(".red", rule.getSelectors().iterator().next());
+        assertEquals("red", rule.getProperties().get("color"));
+    }
+
+    @Test
+    public void customFactoryWorks() {
+        // Given
+        String input = "<html>\n" +
+                "<div id=\"dv\">\n" +
+                "</div>\n" +
+                "</html>";
+
+        XMLParser parser = new XMLParser().with("div", DivElement::new);
+        // When
+        XMLElement root = parser.parse(input);
+        // Then
+        assertEquals(DivElement.class, root.getElementById("dv").getClass());
     }
 }

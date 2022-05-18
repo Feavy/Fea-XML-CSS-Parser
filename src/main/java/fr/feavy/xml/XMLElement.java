@@ -15,10 +15,6 @@ public class XMLElement implements Cloneable {
         this.attributes = attributes;
     }
 
-    public XMLElement(String tagName) {
-        this(tagName, new HashMap<>());
-    }
-
     static String spaces(int amount) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < amount; i++) {
@@ -51,7 +47,7 @@ public class XMLElement implements Cloneable {
         return value;
     }
 
-    private String getAttributesAsString() {
+    protected String getAttributesAsString() {
         StringBuilder attributes = new StringBuilder();
         if (this.attributes.size() > 0) {
             attributes.append(" ");

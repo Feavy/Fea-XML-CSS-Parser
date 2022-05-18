@@ -7,7 +7,7 @@ Simple Java XML Parser with CSS support
 
 ```java
 String myString = "<div><text>Hello !</text></div>";
-XMLElement rootDiv = XMLParser.parse(myString);
+XMLElement rootDiv = new XMLParser().parse(myString);
 ```
 
 ### Parsing a File
@@ -19,4 +19,13 @@ try (FileInputStream fis = new FileInputStream(file)) {
 } catch (IOException e) {
     e.printStackTrace();
 }
+```
+
+### Custom tag handling
+
+```java
+String myString = "<div><text id=\"my-text\">Hello !</text></div>";
+XMLParser parser = new XMLParser().with("text", TextElement::new);
+XMLElement rootDiv = parser.parse(myString);
+TextElement textElement = (TextElement) parser.getElementById("my-text");
 ```

@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,17 +21,21 @@ public class XMLParser {
     private boolean isStartAndEndTag = false;
     private StringBuilder currentText;
     private XMLElement currentElement;
-    private XMLParser() {
-
+    private final Map<String, Function<Map<String, String>, ? extends XMLElement>> elementFactories = new HashMap<>();
+    public XMLParser() {
+        with("style", StyleElement::new);
     }
 
-    public static XMLElement parse(InputStream inputStream) {
-        return new XMLParser()._parse(inputStream);
+    public XMLParser with(String tag, Function<Map<String, String>, ? extends XMLElement> factory) {
+        this.elementFactories.put(tag.toLowerCase(), factory);
+        return this;
     }
 
-    public static XMLElement parse(String data) {
-        return new XMLParser()._parse(data);
+    public XMLParser set(String tag, Function<Map<String, String>, ? extends XMLElement> factory) {
+        return with(tag, factory);
     }
+
+
 
     private static String inputStreamToString(InputStream inputStream) {
         StringBuilder strBuilder = new StringBuilder();
@@ -39,16 +44,15 @@ public class XMLParser {
             while ((line = reader.readLine()) != null) {
                 strBuilder.append(line).append("\n");
             }
-        } catch (IOException e) {
-        }
+        } catch (IOException ignored) { }
         return strBuilder.toString();
     }
 
-    private XMLElement _parse(InputStream inputStream) {
-        return _parse(inputStreamToString(inputStream));
+    public XMLElement parse(InputStream inputStream) {
+        return parse(inputStreamToString(inputStream));
     }
 
-    private XMLElement _parse(String fileContent) {
+    public XMLElement parse(String fileContent) {
         fileContent = fileContent.replaceAll(">(.*)<", ">\n$1\n<")
                 .replaceAll(">(.)", ">\n$1")
                 .replaceAll("(.)<", "$1\n<");
@@ -60,6 +64,15 @@ public class XMLParser {
         return parseElement();
     }
 
+    private XMLElement newElement(String tag, Map<String, String> properties) {
+        tag = tag.toLowerCase();
+        Function<Map<String, String>, ? extends XMLElement> factory = elementFactories.get(tag);
+        if(factory == null) {
+            return new XMLElement(tag, properties);
+        }
+        return factory.apply(properties);
+    }
+
     private XMLElement parseElement() {
         if (!iterator.hasNext()) {
             return currentElement;
@@ -69,10 +82,10 @@ public class XMLParser {
             if (!isEndTag) {
                 currentText = new StringBuilder();
                 if (currentElement == null) {
-                    currentElement = tag.equals("style") ? new StyleElement(properties) : new XMLElement(tag, properties);
+                    currentElement = newElement(tag, properties);
                 } else {
                     XMLElement parent = currentElement;
-                    XMLElement child = tag.equals("style") ? new StyleElement(properties) : new XMLElement(tag, properties);
+                    XMLElement child = newElement(tag, properties);
                     if (!isStartAndEndTag) {
                         currentElement = child;
                     }

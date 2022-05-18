@@ -14,7 +14,7 @@ public class StyleElement extends XMLElement {
     }
 
     public StyleElement() {
-        super("style");
+        super("style", new HashMap<>());
     }
 
     public List<CSSRule> getRules() {
@@ -60,7 +60,7 @@ public class StyleElement extends XMLElement {
 
     public String toString(int indent) {
         StringBuilder builder = new StringBuilder();
-        builder.append(spaces(indent)).append("<style>\n");
+        builder.append(spaces(indent)).append("<style").append(getAttributesAsString()).append(">\n");
         for (CSSRule rule : rules) {
             builder.append(rule.toString(indent + 2));
         }
