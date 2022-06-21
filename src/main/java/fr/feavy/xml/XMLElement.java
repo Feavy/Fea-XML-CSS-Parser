@@ -18,6 +18,10 @@ public class XMLElement implements Cloneable {
         this.attributes = attributes;
     }
 
+    public XMLElement(String tagName) {
+        this(tagName, new HashMap<>());
+    }
+
     static String spaces(int amount) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < amount; i++) {
