@@ -42,6 +42,15 @@ public class XMLElement implements Cloneable {
         attributes.remove(key);
     }
 
+    /**
+     * Get an attribute of this element. Doesn't search in parent elements.
+     * @param key
+     * @return
+     */
+    public String getOwnAttribute(String key) {
+        return attributes.get(key);
+    }
+
     public String getAttribute(String key) {
         String value = attributes.get(key);
         if (value == null && hasParent()) {
