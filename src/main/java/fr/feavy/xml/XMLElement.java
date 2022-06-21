@@ -1,7 +1,10 @@
 package fr.feavy.xml;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class XMLElement implements Cloneable {
     protected final Map<String, String> attributes;
@@ -110,8 +113,16 @@ public class XMLElement implements Cloneable {
         return this.children;
     }
 
+    public List<XMLElement> getChildren(Predicate<XMLElement> predicate) {
+        return this.children.stream().filter(predicate).collect(Collectors.toList());
+    }
+
     public XMLElement getChild(int index) {
         return this.children.get(index);
+    }
+
+    public void remove() {
+        this.parent.removeChild(this);
     }
 
     public void removeChildren() {
@@ -124,6 +135,11 @@ public class XMLElement implements Cloneable {
 
     public void removeChild(XMLElement child) {
         this.children.remove(child);
+    }
+
+    public void addChild(int index, XMLElement child) {
+        this.children.add(index, child);
+        child.parent = this;
     }
 
     public void addChild(XMLElement child) {
@@ -216,6 +232,23 @@ public class XMLElement implements Cloneable {
         this.content = content;
     }
 
+    public void visitDeep(Consumer<XMLElement> consumer) {
+        consumer.accept(this);
+        for (XMLElement child : children) {
+            consumer.accept(child);
+            child.visitDeep(consumer);
+        }
+    }
+
+    public void visitDeep(BiConsumer<XMLElement, Iterator<XMLElement>> consumer) {
+        Iterator<XMLElement> iterator = children.iterator();
+        while (iterator.hasNext()) {
+            XMLElement child = iterator.next();
+            consumer.accept(child, iterator);
+            child.visitDeep(consumer);
+        }
+    }
+
     @Override
     public XMLElement clone() {
         XMLElement rep = new XMLElement(this.tagName, new HashMap<>(this.attributes));
@@ -225,13 +258,4 @@ public class XMLElement implements Cloneable {
         }
         return rep;
     }
-
-    public void visitDeep(Consumer<XMLElement> consumer) {
-        consumer.accept(this);
-        for (XMLElement child : children) {
-            consumer.accept(child);
-            child.visitDeep(consumer);
-        }
-    }
-
 }
